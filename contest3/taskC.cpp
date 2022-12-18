@@ -1,8 +1,16 @@
 #include <iostream>
 
+struct Point {
+    int x, y;
+};
 
-int area(std::pair<int, int> a, std::pair<int, int> b, std::pair<int, int> c) {
-    return (b.first - a.first) * (c.second - a.second) - (b.second - a.second) * (c.first - a.first);
+std::istream& operator>>(std::istream& in, Point& p) {
+    in >> p.x >> p.y;
+    return in;
+}
+
+int area(Point a, Point b, Point c) {
+    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
 bool inter(int a, int b, int c, int d) {
@@ -15,16 +23,17 @@ bool inter(int a, int b, int c, int d) {
     return std::max(a, c) <= std::min(b, d);
 }
 
+bool segmentIntersect(Point a, Point b, Point c, Point d) {
+    return inter(a.x, b.x, c.x, d.x) && inter(a.y, b.y, c.y, d.y)
+        && area(a, b, c) * area(a, b, d) <= 0
+        && area(c, d, a) * area(c, d, b) <= 0;
+}
+
 int main() {
     std::ios_base::sync_with_stdio(false);
     std::cout.tie(0);
     std::cin.tie(0);
-    std::pair<int, int> a, b, c, d;
-    std::cin >> a.first >> a.second;
-    std::cin >> b.first >> b.second;
-    std::cin >> c.first >> c.second;
-    std::cin >> d.first >> d.second;
-    std::cout << (inter(a.first, b.first, c.first, d.first) && inter(a.second, b.second, c.second, d.second)
-        && area(a, b, c) * area(a, b, d) <= 0
-        && area(c, d, a) * area(c, d, b) <= 0 ? "YES" : "NO");
+    Point a, b, c, d;
+    std::cin >> a >> b >> c >> d;
+    std::cout << (segmentIntersect(a, b, c, d) ? "YES" : "NO");
 }
