@@ -16,8 +16,8 @@ struct Node {
     Node() : to(std::vector<int>(ALPH_SZ, -1)), go(std::vector<int>(ALPH_SZ)), link(-1) {}
 };
 
-char getSymbol() {
-    return 'a';
+int charToInt(const std::string& s, int pos) {
+    return s[pos] - 'a';
 }
 
 void add(const std::string& s, std::vector<Node>& trie, int num, std::vector<int>& pos) {
@@ -25,13 +25,13 @@ void add(const std::string& s, std::vector<Node>& trie, int num, std::vector<int
         trie.emplace_back();
     }
     int v = 0;
-    char sym = getSymbol();
     for (size_t i = 0; i < s.size(); ++i) {
-        if (trie[v].to[s[i] - sym] == -1) {
-            trie[v].to[s[i] - sym] = trie.size();
+        int pos = charToInt(s, i);
+        if (trie[v].to[pos] == -1) {
+            trie[v].to[pos] = trie.size();
             trie.emplace_back();
         }
-        v = trie[v].to[s[i] - sym];
+        v = trie[v].to[pos];
     }
     if (trie[v].term) {
         pos.push_back(trie[v].pos);
@@ -79,9 +79,9 @@ void Aho_Corasick(std::vector<Node>& trie) {
 std::vector<std::vector<int>> getAns(const std::vector<Node>& trie, const std::string &s, int n) {
     std::vector<std::vector<int>> ans(n);
     int v = 0;
-    char sym = getSymbol();
     for (size_t i = 0; i < s.size(); ++i) {
-        v = trie[v].go[s[i] - sym];
+        int pos = charToInt(s, i);
+        v = trie[v].go[pos];
         int u = v;
         while (u != 0) {
             if (trie[u].term) {
