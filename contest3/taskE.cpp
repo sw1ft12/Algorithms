@@ -32,6 +32,30 @@ bool isOnSegment(Point a, Point b, Point c) {
 	return dist1 == dist2 + dist3;
 }
 
+int isInPolygon(const std::vector<Point>& polygon, Point p) {
+	size_t n = polygon.size() - 1;
+	long long cnt = 0;
+	for (size_t j = 0; j < n; ++j) {
+		if (isOnSegment(polygon[j], polygon[j + 1], p)) {
+			return 3;
+		}
+		Point lower = polygon[j];
+		Point upper = polygon[j + 1];
+		if (lower.y > upper.y) {
+			std::swap(lower, upper);
+		}
+		if (lower.y > p.y || upper.y <= p.y) {
+			continue;
+		}
+		long long sign = cross_prod(lower, p, lower, upper);
+		if (sign <= 0) {
+			++cnt;
+		}
+	}
+	return cnt % 2;
+}
+
+
 int main() {
 	int n, m;
 	std::cin >> n >> m;
@@ -42,38 +66,15 @@ int main() {
 	}
 
 	polygon.push_back(polygon[0]);
-	std::vector<Point> points(m);
-	std::vector<bool> isBoundary(m);
+	int x, y;
 	for (size_t i = 0; i < m; ++i) {
-		std::cin >> points[i].x >> points[i].y;
-		for (size_t j = 0; j < n; ++j) {
-			if (isOnSegment(polygon[j], polygon[j + 1], points[i])) {
-				isBoundary[i] = true;
-			}
-		}
-	}
-
-	for (size_t i = 0; i < m; ++i) {
-		long long cnt = 0;
-		for (size_t j = 0; j < n; ++j) {
-			Point lower = polygon[j];
-			Point upper = polygon[j + 1];
-			if (lower.y > upper.y) {
-				std::swap(lower, upper);
-			}
-			if (lower.y > points[i].y || upper.y <= points[i].y) {
-				continue;
-			}
-			long long sign = cross_prod(lower, points[i], lower, upper);
-			if(sign <= 0){
-				++cnt;
-			}
-		}
-		if (isBoundary[i]) {
+		std::cin >> x >> y;
+		Point p = { x , y };
+		int res = isInPolygon(polygon, p);
+		if (res == 3) {
 			std::cout << "BOUNDARY\n";
-			continue;
 		}
-		if (cnt % 2 != 0) {
+		else if (res == 1) {
 			std::cout << "INSIDE\n";
 		}
 		else {
